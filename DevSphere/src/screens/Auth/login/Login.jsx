@@ -1,7 +1,7 @@
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {ScrollView, Text, View} from 'react-native';
 
-export const Login: any = () => {
+const Login = () => {
   return (
     <ScrollView style={{backgroundColor: 'white', flex: 1}}>
       <Text style={{textAlign: 'center', marginTop: 50, fontWeight: 20}}>
@@ -10,3 +10,7 @@ export const Login: any = () => {
     </ScrollView>
   );
 };
+
+export default Login;
+
+const styles = StyleSheet.create({});
