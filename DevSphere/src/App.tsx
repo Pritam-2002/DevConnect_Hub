@@ -1,11 +1,13 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {fonts} from './utils/fonts';
+import {Login} from './screens/auth/login/Login';
+// import {fonts} from './utils/fonts';
+// import {LoginScreen} from './main/auth/login';
 
 const App = () => {
   return (
-    <View>
-      <Text style={{fontFamily: fonts.bold}}>DevSphere</Text>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
+      <Login />
     </View>
   );
 };
