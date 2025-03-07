@@ -55,9 +55,11 @@ const AppStack = () => (
       tabBarInactiveTintColor: '#8D8DAA',
       tabBarStyle: {
         borderTopWidth: 0,
-        height: 60,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor:"blue",
+       
         
       },
     })}

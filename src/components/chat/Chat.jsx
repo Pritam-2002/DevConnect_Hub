@@ -1,97 +1,178 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, SafeAreaView, StatusBar } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  FlatList, 
+  KeyboardAvoidingView, 
+  Platform, 
+  SafeAreaView,
+  Image,
+  StatusBar
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Sample hackathon data
-const HACKATHON_DATA = [
+// Sample connected users data
+const CONNECTED_USERS = [
   {
     id: '1',
-    title: 'TechCrunch Disrupt',
-    description: 'Join the world\'s leading tech hackathon with $50,000 in prizes',
-    date: 'May 15-17, 2025',
-    location: 'San Francisco, CA',
-    image: 'https://via.placeholder.com/150',
-    tags: ['AI', 'Blockchain', 'Web3'],
-    registrationOpen: true,
+    name: 'John Smith',
+    avatar: 'https://via.placeholder.com/150',
+    online: true,
+    lastSeen: 'now'
   },
   {
     id: '2',
-    title: 'HackMIT',
-    description: 'MIT\'s premier hackathon for students around the globe',
-    date: 'June 5-7, 2025',
-    location: 'Cambridge, MA',
-    image: 'https://via.placeholder.com/150',
-    tags: ['Machine Learning', 'IoT', 'FinTech'],
-    registrationOpen: true,
+    name: 'Sarah Johnson',
+    avatar: 'https://via.placeholder.com/150',
+    online: true,
+    lastSeen: 'now'
   },
   {
     id: '3',
-    title: 'EU Hackathon',
-    description: 'European Commission\'s annual coding marathon',
-    date: 'July 20-22, 2025',
-    location: 'Berlin, Germany',
-    image: 'https://via.placeholder.com/150',
-    tags: ['GovTech', 'CleanTech', 'HealthTech'],
-    registrationOpen: false,
+    name: 'Michael Brown',
+    avatar: 'https://via.placeholder.com/150',
+    online: false,
+    lastSeen: '2 hours ago'
   },
   {
     id: '4',
-    title: 'Hack the North',
-    description: 'Canada\'s biggest hackathon with 1000+ participants',
-    date: 'August 12-14, 2025',
-    location: 'Toronto, Canada',
-    image: 'https://via.placeholder.com/150',
-    tags: ['AR/VR', 'Cloud Computing', 'DevOps'],
-    registrationOpen: true,
+    name: 'Emma Wilson',
+    avatar: 'https://via.placeholder.com/150',
+    online: true,
+    lastSeen: 'now'
   },
   {
     id: '5',
-    title: 'Tokyo Tech Fest',
-    description: 'Asia\'s premier technology hackathon',
-    date: 'September 8-10, 2025',
-    location: 'Tokyo, Japan',
-    image: 'https://via.placeholder.com/150',
-    tags: ['Robotics', 'Smart Cities', '5G'],
-    registrationOpen: true,
-  },
+    name: 'Alex Garcia',
+    avatar: 'https://via.placeholder.com/150',
+    online: false,
+    lastSeen: '15 minutes ago'
+  }
 ];
 
-export default function HomePage() {
-  const [notificationCount, setNotificationCount] = useState(3);
+// Sample message data
+const INITIAL_MESSAGES = [
+  {
+    id: '1',
+    text: 'Hey everyone! How\'s the hackathon project going?',
+    sender: '1',
+    timestamp: '10:35 AM',
+    read: true
+  },
+  {
+    id: '2',
+    text: 'We\'re making good progress on the frontend!',
+    sender: '2',
+    timestamp: '10:37 AM',
+    read: true
+  },
+  {
+    id: '3',
+    text: 'I\'m still working on the API integration. Should be done in about an hour.',
+    sender: '3',
+    timestamp: '10:40 AM',
+    read: true
+  },
+  {
+    id: '4',
+    text: 'Great! I\'ve finished the database schema and working on user authentication now.',
+    sender: '4',
+    timestamp: '10:42 AM',
+    read: true
+  },
+  {
+    id: '5',
+    text: 'I need some help with the deployment setup if anyone has time.',
+    sender: '5',
+    timestamp: '10:45 AM',
+    read: false
+  }
+];
 
-  const renderHackathonCard = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardDescription} numberOfLines={2}>{item.description}</Text>
-        <View style={styles.cardDetails}>
-          <View style={styles.cardDetailItem}>
-            <Ionicons name="location-outline" size={16} color="#666" />
-            <Text style={styles.cardDetailText}>{item.location}</Text>
-          </View>
-          <View style={styles.cardDetailItem}>
-            <Ionicons name="calendar-outline" size={16} color="#666" />
-            <Text style={styles.cardDetailText}>{item.date}</Text>
-          </View>
-        </View>
-        <View style={styles.tagsContainer}>
-          {item.tags.map((tag, index) => (
-            <View key={index} style={styles.tagBadge}>
-              <Text style={styles.tagText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
+// Current user ID (in a real app, this would come from authentication)
+const CURRENT_USER_ID = '1';
+
+export default function ChatPage() {
+  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const [inputText, setInputText] = useState('');
+  const [connectedUsers, setConnectedUsers] = useState(CONNECTED_USERS);
+  const flatListRef = useRef(null);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
+  // Send message function
+  const sendMessage = () => {
+    if (inputText.trim() === '') return;
+    
+    const newMessage = {
+      id: Date.now().toString(),
+      text: inputText,
+      sender: CURRENT_USER_ID,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      read: false
+    };
+    
+    setMessages([...messages, newMessage]);
+    setInputText('');
+  };
+
+  // Find user by ID
+  const getUserById = (userId) => {
+    return connectedUsers.find(user => user.id === userId);
+  };
+
+  // Check if message is from current user
+  const isCurrentUser = (userId) => {
+    return userId === CURRENT_USER_ID;
+  };
+
+  // Render message item
+  const renderMessage = ({ item }) => {
+    const user = getUserById(item.sender);
+    const isOwnMessage = isCurrentUser(item.sender);
+    
+    return (
+      <View style={[
+        styles.messageContainer,
+        isOwnMessage ? styles.ownMessageContainer : styles.otherMessageContainer
+      ]}>
+        {!isOwnMessage && (
+          <Image source={{ uri: user.avatar }} style={styles.messageAvatar} />
+        )}
         <View style={[
-          styles.registrationBadge, 
-          { backgroundColor: item.registrationOpen ? '#4CAF50' : '#F44336' }
+          styles.messageBubble,
+          isOwnMessage ? styles.ownMessageBubble : styles.otherMessageBubble
         ]}>
-          <Text style={styles.registrationText}>
-            {item.registrationOpen ? 'Registration Open' : 'Registration Closed'}
-          </Text>
+          {!isOwnMessage && (
+            <Text style={styles.messageSender}>{user.name}</Text>
+          )}
+          <Text style={styles.messageText}>{item.text}</Text>
+          <Text style={styles.messageTimestamp}>{item.timestamp}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+    );
+  };
+
+  // Render connected user
+  const renderConnectedUser = ({ item }) => (
+    <View style={styles.userItem}>
+      <View style={styles.userAvatarContainer}>
+        <Image source={{ uri: item.avatar }} style={styles.userAvatar} />
+        <View style={[
+          styles.userStatus,
+          { backgroundColor: item.online ? '#4CAF50' : '#9E9E9E' }
+        ]} />
+      </View>
+      <Text style={styles.userName} numberOfLines={1}>{item.name}</Text>
+    </View>
   );
 
   return (
@@ -100,35 +181,66 @@ export default function HomePage() {
       
       {/* Header */}
       <View style={styles.header}>
-        <Image 
-          source={{ uri: 'https://via.placeholder.com/150x50' }} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <TouchableOpacity style={styles.notificationButton}>
-          <Ionicons name="notifications" size={28} color="#333" />
-          {notificationCount > 0 && (
-            <View style={styles.notificationBadge}>
-              <Text style={styles.notificationCount}>{notificationCount}</Text>
-            </View>
-          )}
+        <TouchableOpacity style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Team Chat</Text>
+        <TouchableOpacity style={styles.headerButton}>
+          <Ionicons name="ellipsis-vertical" size={24} color="#333" />
         </TouchableOpacity>
       </View>
       
-      {/* Title section */}
-      <View style={styles.titleSection}>
-        <Text style={styles.mainTitle}>Hackathons</Text>
-        <Text style={styles.subtitle}>Discover upcoming coding competitions</Text>
+      {/* Connected Users */}
+      <View style={styles.connectedUsersContainer}>
+        <FlatList
+          data={connectedUsers}
+          renderItem={renderConnectedUser}
+          keyExtractor={item => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.connectedUsersList}
+        />
       </View>
       
-      {/* Hackathon Cards */}
-      <FlatList
-        data={HACKATHON_DATA}
-        renderItem={renderHackathonCard}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.cardsList}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Messages */}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.chatContainer}
+        keyboardVerticalOffset={100}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.messagesList}
+          onLayout={() => flatListRef.current?.scrollToEnd()}
+        />
+        
+        {/* Input area */}
+        <View style={styles.inputContainer}>
+          <TouchableOpacity style={styles.attachButton}>
+            <Ionicons name="attach" size={24} color="#666" />
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Type a message..."
+            value={inputText}
+            onChangeText={setInputText}
+            multiline
+          />
+          <TouchableOpacity 
+            style={[
+              styles.sendButton,
+              inputText.trim() === '' ? styles.sendButtonDisabled : {}
+            ]}
+            onPress={sendMessage}
+            disabled={inputText.trim() === ''}
+          >
+            <Ionicons name="send" size={20} color={inputText.trim() === '' ? '#9E9E9E' : '#fff'} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -137,6 +249,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    marginTop:60
   },
   header: {
     flexDirection: 'row',
@@ -151,118 +264,148 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
-  logo: {
-    width: 150,
-    height: 40,
-  },
-  notificationButton: {
-    position: 'relative',
+  backButton: {
     padding: 5,
   },
-  notificationBadge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: '#FF5252',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notificationCount: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  titleSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-  },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 5,
-  },
-  cardsList: {
-    padding: 16,
-    paddingTop: 0,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 16,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  cardImage: {
-    width: '100%',
-    height: 160,
-  },
-  cardContent: {
-    padding: 16,
-  },
-  cardTitle: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
     color: '#333',
   },
-  cardDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    lineHeight: 20,
+  headerButton: {
+    padding: 5,
   },
-  cardDetails: {
-    flexDirection: 'row',
-    marginBottom: 12,
+  connectedUsersContainer: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
-  cardDetailItem: {
-    flexDirection: 'row',
+  connectedUsersList: {
+    paddingHorizontal: 16,
+  },
+  userItem: {
     alignItems: 'center',
     marginRight: 16,
+    width: 60,
   },
-  cardDetailText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 4,
+  userAvatarContainer: {
+    position: 'relative',
+    marginBottom: 4,
   },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 12,
+  userAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
-  tagBadge: {
-    backgroundColor: '#E0E0E0',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginRight: 6,
-    marginBottom: 6,
+  userStatus: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#fff',
+    bottom: 0,
+    right: 0,
   },
-  tagText: {
+  userName: {
     fontSize: 12,
-    color: '#555',
+    color: '#666',
+    textAlign: 'center',
+    width: '100%',
   },
-  registrationBadge: {
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  chatContainer: {
+    flex: 1,
+  },
+  messagesList: {
+    padding: 16,
+    paddingBottom: 20,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    maxWidth: '80%',
+    marginTop:20
+  },
+  ownMessageContainer: {
+    alignSelf: 'flex-end',
+    justifyContent: 'flex-end',
+  },
+  otherMessageContainer: {
     alignSelf: 'flex-start',
   },
-  registrationText: {
-    fontSize: 12,
-    color: '#fff',
+  messageAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
+    alignSelf: 'flex-end',
+  },
+  messageBubble: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  ownMessageBubble: {
+    backgroundColor: '#DCF8C6',
+  },
+  otherMessageBubble: {
+    backgroundColor: '#fff',
+  },
+  messageSender: {
+    fontSize: 13,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  messageText: {
+    fontSize: 15,
+    color: '#333',
+  },
+  messageTimestamp: {
+    fontSize: 11,
+    color: '#999',
+    alignSelf: 'flex-end',
+    marginTop: 4,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  attachButton: {
+    padding: 8,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginHorizontal: 8,
+    maxHeight: 100,
+  },
+  sendButton: {
+    backgroundColor: '#4CAF50',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#E0E0E0',
   },
 });
