@@ -59,6 +59,32 @@ const ProfilePage = () => {
           <Text style={styles.skill}>TypeScript</Text>
         </View>
       </View>
+
+      {/* Achievements & Certifications */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Achievements & Certifications</Text>
+        <View style={styles.achievementItem}>
+          <Text style={styles.achievementTitle}>
+            Certified React Native Developer
+          </Text>
+          <Text style={styles.achievementOrg}>Udemy</Text>
+          <Text style={styles.achievementDate}>Completed: March 2024</Text>
+        </View>
+        <View style={styles.achievementItem}>
+          <Text style={styles.achievementTitle}>
+            Winner - Code Sprint Hackathon
+          </Text>
+          <Text style={styles.achievementOrg}>HackFest 2023</Text>
+          <Text style={styles.achievementDate}>Held: December 2023</Text>
+        </View>
+        <View style={styles.achievementItem}>
+          <Text style={styles.achievementTitle}>
+            JavaScript Mastery Certificate
+          </Text>
+          <Text style={styles.achievementOrg}>Coursera</Text>
+          <Text style={styles.achievementDate}>Completed: January 2023</Text>
+        </View>
+      </View>
     </ScrollView>
   );
 };
@@ -160,6 +186,21 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
     marginBottom: 10,
+  },
+  achievementItem: {
+    marginBottom: 10,
+  },
+  achievementTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  achievementOrg: {
+    fontSize: 16,
+    color: "gray",
+  },
+  achievementDate: {
+    fontSize: 14,
+    color: "gray",
   },
 });
 
