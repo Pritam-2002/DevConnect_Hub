@@ -1,5 +1,5 @@
 // Auth Screens
-import Login from './Auth/login/Login';
+import Login from './auth/login/Login';
 
 import Home from './App/Home';
 

@@ -3,7 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {Home, Login, Chat, Create, Profile} from './screens';
+import {Home, Login, Chat, Create, Profile} from './screens/index';
 import {View, StyleSheet} from 'react-native';
 import {colors} from './utils/colors';
 

@@ -1,3 +1,3 @@
-import BackgorundView from './BackgorundView';
+import BackgorundView from './shared/backgroundview/BackgorundView';
 
 export {BackgorundView};
