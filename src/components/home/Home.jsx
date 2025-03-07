@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, SafeAreaView, StatusBar,Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HACKATHON_DATA } from '../../../constants/user';
 
@@ -61,7 +61,7 @@ export default function HomePage() {
   const [notificationCount, setNotificationCount] = useState(3);
 
   const renderHackathonCard = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={()=>Linking.openURL("https://www.sih.gov.in/")}>
       <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.title}</Text>
@@ -97,9 +97,16 @@ export default function HomePage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content"  />
       
-      
+      <View style={styles.header}>
+      <Text style={styles.appName}>DevSphere</Text>
+      <TouchableOpacity style={styles.contactButton} onPress={()=>{
+        console.log("contact pressed")
+      }}>
+        <Ionicons name="mail" size={24} color="black" />
+      </TouchableOpacity>
+    </View>
       
       {/* Title section */}
       <View style={styles.titleSection}>
@@ -114,6 +121,7 @@ export default function HomePage() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.cardsList}
         showsVerticalScrollIndicator={false}
+        
       />
     </SafeAreaView>
   );
@@ -136,6 +144,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
+    
+  },
+  header: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+ marginTop:30,
+    backgroundColor: '#f0f0f0', // Adjust background color
+    borderBottomWidth:1,
+    borderBottomColor: 'lightgrey',
+  },
+  appName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  contactButton: {
+    padding: 8, // Add padding for touch target
   },
   logo: {
     width: 150,
@@ -163,8 +190,8 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     paddingHorizontal: 16,
-    paddingVertical: 20,
-    marginTop:30
+    paddingVertical:10,
+    marginTop:10
   },
   mainTitle: {
     fontSize: 28,

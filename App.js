@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Home from "./src/components/home/Home"
-import Post from "./src/components/post/Post"
-import Chat from "./src/components/chat/Chat"
-import Profile from "./src/components/profile/Profile"
+import Home from "./src/components/home/Home";
+import Post from "./src/components/post/Post";
+import Chat from "./src/components/chat/Chat";
+import Profile from "./src/components/profile/Profile";
 import Icon from 'react-native-vector-icons/Ionicons';
-// import { Home, Login, Chat, Create, Profile, Post } from '';
-import Login from "./src/components/auth/login/Login"
-import { View, StyleSheet, Text } from 'react-native';
-// import { colors } from './utils/colors';
+import Login from "./src/components/auth/login/Login";
+import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { AuthProvider, useAuth } from './context/login'; // Import AuthProvider and useAuth
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -51,16 +50,14 @@ const AppStack = () => (
         return <Icon name={iconName} size={size} color={color} />;
       },
       tabBarShowLabel: false,
-      tabBarActiveTintColor: '#fff',
+      tabBarActiveTintColor: '#28CEE7',
       tabBarInactiveTintColor: '#8D8DAA',
       tabBarStyle: {
         borderTopWidth: 0,
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor:"blue",
-       
-        
+        backgroundColor: "#D0F9FD",
       },
     })}
   >
@@ -72,16 +69,24 @@ const AppStack = () => (
 );
 
 export default function App() {
-  const [isLogin, setIsLogin] = useState(true);
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
+    );
+}
 
-  return (
-    <NavigationContainer>
-      <View style={styles.container}>
-        {isLogin ? <AppStack /> : <AuthStack />}
-        <StatusBar style="auto"  />
-      </View>
-    </NavigationContainer>
-  );
+function AppContent() {
+    const { isLoggedIn } = useAuth(); // Use the useAuth hook
+
+    return (
+        <NavigationContainer>
+            <View style={styles.container}>
+                {isLoggedIn ? <AppStack /> : <AuthStack />}
+                <StatusBar style="auto" />
+            </View>
+        </NavigationContainer>
+    );
 }
 
 const styles = StyleSheet.create({

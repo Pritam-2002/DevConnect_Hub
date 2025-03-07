@@ -11,12 +11,20 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Checkbox } from 'react-native-paper';
+import { useAuth } from  "../../../../context/login"; // Import useAuth hook
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const { login } = useAuth(); // Access login function from context
+
+  const handleSignIn = () => {
+    // Add your authentication logic here (e.g., API call)
+    // For now, just simulate a successful login
+    login(); // Set isLoggedIn to true
+  };
 
   return (
     <LinearGradient colors={['#0077B5', '#005087']} style={styles.container}>
@@ -74,7 +82,7 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={handleSignIn}>
             <Text style={styles.loginButtonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -159,5 +167,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-
-
