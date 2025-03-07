@@ -2,5 +2,6 @@
 import Login from './auth/login/Login';
 
 import Home from './App/Home';
+import Post from './post/Post'
 
-export {Home, Login};
+export {Home, Login,Post};
